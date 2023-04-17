@@ -47,9 +47,9 @@ class TNet(nn.Module):
         return output
 
 # ------ TO DO ------
-class pointnet(nn.Module):
+class Pointnet(nn.Module):
     def __init__(self, num_classes=3):
-        super(pointnet, self).__init__()
+        super(Pointnet, self).__init__()
         
         self.input_transform = TNet(k=3)
         self.feature_transform = TNet(k=64)
