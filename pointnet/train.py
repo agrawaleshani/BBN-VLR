@@ -5,7 +5,7 @@ import time
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 
-from pointnet import pointnet
+from pointnet import Pointnet
 from utils import save_checkpoint, create_dir
 from pointnet2 import PointNet2
 
