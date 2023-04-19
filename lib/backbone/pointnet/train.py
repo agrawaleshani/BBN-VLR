@@ -92,7 +92,7 @@ def main(args):
 
     # ------ TO DO: Initialize Model ------
     if args.task == "cls":
-        model = pointnet(num_classes=10)
+        model = Pointnet(num_classes=10)
     
     # Load Checkpoint 
     if args.load_checkpoint:

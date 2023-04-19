@@ -65,15 +65,15 @@ if __name__ == "__main__":
     train_set = eval(cfg.DATASET.DATASET)("train", cfg)
     valid_set = eval(cfg.DATASET.DATASET)("valid", cfg)
 
-    annotations = train_set.get_annotations()
-    num_classes = train_set.get_num_classes()
+    # annotations = train_set.get_annotations()
+    # num_classes = train_set.get_num_classes()
     device = torch.device("cpu" if cfg.CPU_MODE else "cuda")
 
-    num_class_list, cat_list = get_category_list(annotations, num_classes, cfg)
+    # num_class_list, cat_list = get_category_list(annotations, num_classes, cfg)
 
     para_dict = {
-        "num_classes": num_classes,
-        "num_class_list": num_class_list,
+        "num_classes": 10, #CHANGE TODO,
+        # "num_class_list": num_class_list,
         "cfg": cfg,
         "device": device,
     }

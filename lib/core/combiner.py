@@ -25,9 +25,10 @@ class Combiner:
         return eval("self.{}".format(self.type))(
             model, criterion, image, label, meta, **kwargs
         )
-
+        
+    ## we will use default one only
     def default(self, model, criterion, image, label, **kwargs):
-        image, label = image.to(self.device), label.to(self.device)
+        image, label = image.to(self.device), label.to(self.device).to(torch.long)
         output = model(image)
         loss = criterion(output, label)
         now_result = torch.argmax(self.func(output), 1)

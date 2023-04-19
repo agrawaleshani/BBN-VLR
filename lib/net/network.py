@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from backbone import res50, bbn_res50, res32_cifar, bbn_res32_cifar
+from backbone import res50, bbn_res50, res32_cifar, bbn_res32_cifar, pointNetModel10, pointNetModel40
 from modules import GAP, Identity, FCNorm
 
 

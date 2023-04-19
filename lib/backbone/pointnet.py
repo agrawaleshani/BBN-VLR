@@ -194,3 +194,13 @@ class seg_model(nn.Module):
         seg_output = seg_output.permute(0, 2, 1) # B, N, num_seg_classes
         
         return seg_output
+    
+    
+def pointNetModel10():
+    model = Pointnet(num_classes=10)
+    return model
+
+
+def pointNetModel40():
+    model = Pointnet(num_classes=40)
+    return model

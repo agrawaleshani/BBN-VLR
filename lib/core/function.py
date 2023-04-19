@@ -33,16 +33,21 @@ def train_model(
 
     all_loss = AverageMeter()
     acc = AverageMeter()
-    for i, (image, label, meta) in enumerate(trainLoader):
-        cnt = label.shape[0]
-        loss, now_acc = combiner.forward(model, criterion, image, label, meta)
+    for i, (batch) in enumerate(trainLoader):
+        s = batch.y.shape[0]
+        point_clouds, labels = batch.pos.view(s, -1, 3), batch.y
+        # point_clouds = point_clouds.to('cuda')
+        # labels = labels.to('cuda').to(torch.long)
+        meta = None
+
+        loss, now_acc = combiner.forward(model, criterion, point_clouds, labels, meta)
 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
-        all_loss.update(loss.data.item(), cnt)
-        acc.update(now_acc, cnt)
+        all_loss.update(loss.data.item(), s)
+        acc.update(now_acc, s)
 
         if i % cfg.SHOW_STEP == 0:
             pbar_str = "Epoch:{:>3d}  Batch:{:>3d}/{}  Batch_Loss:{:>5.3f}  Batch_Accuracy:{:>5.2f}%     ".format(
@@ -69,19 +74,21 @@ def valid_model(
         all_loss = AverageMeter()
         acc = AverageMeter()
         func = torch.nn.Softmax(dim=1)
-        for i, (image, label, meta) in enumerate(dataLoader):
-            image, label = image.to(device), label.to(device)
+        for i, (batch) in enumerate(dataLoader):
+            point_clouds, labels = batch.pos.view(s, -1, 3), batch.y
+            point_clouds = point_clouds.to('cuda')
+            labels = labels.to('cuda').to(torch.long)
 
-            feature = model(image, feature_flag=True)
+            feature = model(point_clouds, feature_flag=True)
 
             output = model(feature, classifier_flag=True)
-            loss = criterion(output, label)
+            loss = criterion(output, labels)
             score_result = func(output)
 
             now_result = torch.argmax(score_result, 1)
-            all_loss.update(loss.data.item(), label.shape[0])
-            fusion_matrix.update(now_result.cpu().numpy(), label.cpu().numpy())
-            now_acc, cnt = accuracy(now_result.cpu().numpy(), label.cpu().numpy())
+            all_loss.update(loss.data.item(), labels.shape[0])
+            fusion_matrix.update(now_result.cpu().numpy(), labels.cpu().numpy())
+            now_acc, cnt = accuracy(now_result.cpu().numpy(), labels.cpu().numpy())
             acc.update(now_acc, cnt)
 
         pbar_str = "------- Valid: Epoch:{:>3d}  Valid_Loss:{:>5.3f}   Valid_Acc:{:>5.2f}%-------".format(
