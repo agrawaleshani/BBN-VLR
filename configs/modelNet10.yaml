@@ -14,7 +14,7 @@ DATASET:
     RATIO: 0.02
 
 BACKBONE:
-  TYPE: 'pointnet'
+  TYPE: 'pointNetModel'
   FEAT: 256
 
 MODULE:
