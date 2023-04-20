@@ -1,5 +1,5 @@
 NAME: 'BBN.MODELNET10.pointnet.200epoch'
-OUTPUT_DIR: './output/mpdelnet10'
+OUTPUT_DIR: './output/modelnet10'
 SHOW_STEP: 100
 SAVE_STEP: 5
 VALID_STEP: 1
@@ -14,13 +14,15 @@ DATASET:
     RATIO: 0.02
 
 BACKBONE:
-  TYPE: 'pointNetModel10'
+  TYPE: 'pointnet'
+  FEAT: 256
 
 MODULE:
   TYPE: 'GAP'
 
 CLASSIFIER:
   TYPE: 'FC'
+  CLASSES: 10
   BIAS: True
 
 LOSS:
