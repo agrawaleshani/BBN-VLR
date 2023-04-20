@@ -202,7 +202,7 @@ def pointNetModel(
     pretrained_model="/data/Data/pretrain_models/resnet50-19c8e357.pth",
     last_layer_stride=2,
 ):
-    pointnet = Pointnet(num_classes=cfg.num_classes)
+    pointnet = Pointnet(num_classes=cfg.DATASET.CLASSES)
     if pretrain and pretrained_model != "":
         pointnet.load_model(pretrain=pretrained_model)
     else:
