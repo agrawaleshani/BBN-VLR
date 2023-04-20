@@ -48,7 +48,7 @@ class TNet(nn.Module):
 
 # ------ TO DO ------
 class Pointnet(nn.Module):
-    def __init__(self, num_classes=3):
+    def __init__(self):
         super(Pointnet, self).__init__()
         
         self.input_transform = TNet(k=3)
@@ -82,9 +82,7 @@ class Pointnet(nn.Module):
             nn.Linear(512, 256, device=DEVICE),
             nn.Dropout(0.3),
             nn.BatchNorm1d(256, device=DEVICE),
-            nn.ReLU(True),
-            nn.Linear(256, num_classes, device=DEVICE),
-            nn.Dropout(0.3)
+            nn.ReLU(True)
         )
 
     def forward(self, points):
@@ -109,7 +107,7 @@ class Pointnet(nn.Module):
         output = nn.MaxPool1d(output.size(2))(output) # B, 1024, 1
         output = nn.Flatten()(output) # B, 1024
         
-        output = self.final_mlp_block(output) # B, num_classes
+        output = self.final_mlp_block(output) # B, 256
         
         return output
 
@@ -202,7 +200,7 @@ def pointNetModel(
     pretrained_model="/data/Data/pretrain_models/resnet50-19c8e357.pth",
     last_layer_stride=2,
 ):
-    pointnet = Pointnet(num_classes=cfg.DATASET.CLASSES)
+    pointnet = Pointnet()
     if pretrain and pretrained_model != "":
         pointnet.load_model(pretrain=pretrained_model)
     else:
