@@ -16,7 +16,7 @@ class Network(nn.Module):
             else False
         )
 
-        self.num_classes = num_classes
+        self.num_classes = cfg.DATASET.CLASSES
         self.cfg = cfg
 
         self.backbone = eval(self.cfg.BACKBONE.TYPE)(
@@ -28,6 +28,7 @@ class Network(nn.Module):
         self.module = self._get_module()
         self.classifier = self._get_classifer()
         self.feature_len = self.get_feature_length()
+        self.dropout = nn.Dropout(0.3)
 
 
     def forward(self, x, **kwargs):
@@ -41,6 +42,8 @@ class Network(nn.Module):
         x = x.view(x.shape[0], -1)
 
         x = self.classifier(x)
+        if "pointnet" in self.cfg.BACKBONE.TYPE:
+            x = self.dropout(x)
         return x
 
 
@@ -92,6 +95,10 @@ class Network(nn.Module):
 
         if "bbn" in self.cfg.BACKBONE.TYPE:
             num_features = num_features * 2
+            
+        if "pointnet" in self.cfg.BACKBONE.TYPE:
+            num_features = self.cfg.BACKBONE.FEAT
+            
         return num_features
 
 
