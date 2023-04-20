@@ -42,7 +42,7 @@ class Network(nn.Module):
         x = x.view(x.shape[0], -1)
 
         x = self.classifier(x)
-        if "pointnet" in self.cfg.BACKBONE.TYPE:
+        if "pointNetModel" in self.cfg.BACKBONE.TYPE:
             x = self.dropout(x)
         return x
 
