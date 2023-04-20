@@ -194,13 +194,17 @@ class seg_model(nn.Module):
         seg_output = seg_output.permute(0, 2, 1) # B, N, num_seg_classes
         
         return seg_output
-    
-    
-def pointNetModel10():
-    model = Pointnet(num_classes=10)
-    return model
 
 
-def pointNetModel40():
-    model = Pointnet(num_classes=40)
-    return model
+def pointNetModel(
+    cfg,
+    pretrain=False,
+    pretrained_model="/data/Data/pretrain_models/resnet50-19c8e357.pth",
+    last_layer_stride=2,
+):
+    pointnet = Pointnet(num_classes=cfg.num_classes)
+    if pretrain and pretrained_model != "":
+        pointnet.load_model(pretrain=pretrained_model)
+    else:
+        print("Choose to train from scratch")
+    return pointnet
