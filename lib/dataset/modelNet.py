@@ -64,10 +64,6 @@ class IMBALANCEMODELNET10():
         img, target = self.data[index], self.targets[index]
         meta = dict()
 
-        # doing this so that it is consistent with all other datasets
-        # to return a PIL Image
-        img = Image.fromarray(img)
-
         if self.dual_sample:
             if self.cfg.TRAIN.SAMPLER.DUAL_SAMPLER.TYPE == "reverse":
                 sample_class = self.sample_class_index_by_weight()
