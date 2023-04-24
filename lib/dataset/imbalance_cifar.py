@@ -7,13 +7,20 @@ from PIL import Image
 import random
 
 
+class Config:
+    def __init__(self, **kwargs):
+        for key in kwargs.keys():
+            setattr(self, key, kwargs[key])
+
+
 class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
     cls_num = 10
 
-    def __init__(self, mode, cfg, root = './datasets/imbalance_cifar10', imb_type='exp',
+    def __init__(self, mode, cfg, root='./datasets/imbalance_cifar10', imb_type='exp',
                  transform=None, target_transform=None, download=True):
         train = True if mode == "train" else False
-        super(IMBALANCECIFAR10, self).__init__(root, train, transform, target_transform, download)
+        super(torchvision.datasets.CIFAR10, self).__init__(root, train,
+                                                           transform=transform, target_transform=target_transform)
         self.cfg = cfg
         self.train = train
         self.dual_sample = True if cfg.TRAIN.SAMPLER.DUAL_SAMPLER.ENABLE and self.train else False
@@ -22,6 +29,8 @@ class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
             np.random.seed(rand_number)
             random.seed(rand_number)
             imb_factor = self.cfg.DATASET.IMBALANCECIFAR.RATIO
+            import pdb
+            pdb.set_trace()
             img_num_list = self.get_img_num_per_cls(self.cls_num, imb_type, imb_factor)
             self.gen_imbalanced_data(img_num_list)
             self.transform = transforms.Compose([
@@ -32,9 +41,9 @@ class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
             ])
         else:
             self.transform = transforms.Compose([
-                             transforms.ToTensor(),
-                             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-                            ])
+                transforms.ToTensor(),
+                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            ])
         print("{} Mode: Contain {} images".format(mode, len(self.data)))
         if self.dual_sample or (self.cfg.TRAIN.SAMPLER.TYPE == "weighted sampler" and self.train):
             self.class_weight, self.sum_weight = self.get_weight(self.get_annotations(), self.cls_num)
@@ -97,7 +106,7 @@ class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
         """
         if self.cfg.TRAIN.SAMPLER.TYPE == "weighted sampler" and self.train:
             assert self.cfg.TRAIN.SAMPLER.WEIGHTED_SAMPLER.TYPE in ["balance", "reverse"]
-            if  self.cfg.TRAIN.SAMPLER.WEIGHTED_SAMPLER.TYPE == "balance":
+            if self.cfg.TRAIN.SAMPLER.WEIGHTED_SAMPLER.TYPE == "balance":
                 sample_class = random.randint(0, self.cls_num - 1)
             elif self.cfg.TRAIN.SAMPLER.WEIGHTED_SAMPLER.TYPE == "reverse":
                 sample_class = self.sample_class_index_by_weight()
@@ -167,12 +176,13 @@ class IMBALANCECIFAR10(torchvision.datasets.CIFAR10):
         new_data = np.vstack(new_data)
         self.data = new_data
         self.targets = new_targets
-        
+
     def get_cls_num_list(self):
         cls_num_list = []
         for i in range(self.cls_num):
             cls_num_list.append(self.num_per_cls_dict[i])
         return cls_num_list
+
 
 class IMBALANCECIFAR100(IMBALANCECIFAR10):
     """`CIFAR100 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ Dataset.
@@ -197,12 +207,36 @@ class IMBALANCECIFAR100(IMBALANCECIFAR10):
     cls_num = 100
 
 
-if __name__ == '__main__':
-    transform = transforms.Compose(
-        [transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    trainset = IMBALANCECIFAR100(root='./data', train=True,
-                    download=True, transform=transform)
-    trainloader = iter(trainset)
-    data, label = next(trainloader)
-    import pdb; pdb.set_trace()
+# if __name__ == '__main__':
+#     transform = transforms.Compose(
+#         [transforms.ToTensor(),
+#         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+#     trainset = IMBALANCECIFAR100(root='./data', train=True,
+#                     download=True, transform=transform)
+#     trainloader = iter(trainset)
+#     data, label = next(trainloader)
+#     import pdb; pdb.set_trace()
+
+if __name__ == "__main__":
+    cfg = Config(
+        DATASET=Config(
+            CLASSES=10,
+            IMBALANCECIFAR=Config(
+                RANDOM_SEED=16824,
+                RATIO=0.5
+            )
+        ),
+        TRAIN=Config(
+            SAMPLER=Config(
+                TYPE="weighted sampler", # "weighted sampler" or "dual sampler"
+                DUAL_SAMPLER=Config(
+                    TYPE=True,
+                    ENABLE=None,
+                ),
+                WEIGHTED_SAMPLER=Config(
+                    TYPE="balance", # "balance", "reverse"
+                ),
+            )
+        )
+    )
+    d = IMBALANCECIFAR10(mode="train", cfg=cfg)

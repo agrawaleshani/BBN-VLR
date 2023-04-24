@@ -1,6 +1,8 @@
 import numpy as np
-import torch, math
+import torch
+import math
 from core.evaluate import accuracy
+
 
 class Combiner:
     def __init__(self, cfg, device):
@@ -20,12 +22,12 @@ class Combiner:
 
     def reset_epoch(self, epoch):
         self.epoch = epoch
-    
+
     def forward(self, model, criterion, image, label, meta, **kwargs):
         return eval("self.{}".format(self.type))(
-            model, criterion, image, label, meta, **kwargs
+            model, criterion, image, label, meta=meta, **kwargs
         )
-        
+
     ## we will use default one only
     def default(self, model, criterion, image, label, **kwargs):
         image, label = image.to(self.device), label.to(self.device).to(torch.long)
@@ -60,9 +62,8 @@ class Combiner:
 
         now_result = torch.argmax(self.func(output), 1)
         now_acc = (
-                l * accuracy(now_result.cpu().numpy(), label_a.cpu().numpy())[0]
-                + (1 - l) * accuracy(now_result.cpu().numpy(), label_b.cpu().numpy())[0]
+            l * accuracy(now_result.cpu().numpy(), label_a.cpu().numpy())[0]
+            + (1 - l) * accuracy(now_result.cpu().numpy(), label_b.cpu().numpy())[0]
         )
 
         return loss, now_acc
-

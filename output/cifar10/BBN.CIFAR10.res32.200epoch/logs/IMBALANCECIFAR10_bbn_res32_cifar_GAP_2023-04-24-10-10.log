@@ -1,0 +1,80 @@
+2023-04-24 10:10:04,390 ---------------------Cfg is set as follow--------------------
+2023-04-24 10:10:04,390 BACKBONE:
+  FREEZE: False
+  PRETRAINED_MODEL: 
+  TYPE: bbn_res32_cifar
+CLASSIFIER:
+  BIAS: True
+  TYPE: FC
+COLOR_SPACE: RGB
+CPU_MODE: False
+DATASET:
+  DATASET: IMBALANCECIFAR10
+  DATA_TYPE: jpg
+  IMBALANCECIFAR:
+    RANDOM_SEED: 0
+    RATIO: 0.02
+  ROOT: /home/cifar10/data
+  TRAIN_JSON: 
+  VALID_JSON: 
+EVAL_MODE: False
+INPUT_SIZE: (32, 32)
+LOSS:
+  CSCE:
+    DRW_EPOCH: 160
+    SCHEDULER: default
+  LDAM:
+    DRW_EPOCH: 160
+    MAX_MARGIN: 0.5
+  LOSS_TYPE: CrossEntropy
+MODULE:
+  TYPE: GAP
+NAME: BBN.CIFAR10.res32.200epoch
+OUTPUT_DIR: ./output/cifar10
+PIN_MEMORY: True
+RESUME_MODE: all
+RESUME_MODEL: 
+SAVE_STEP: 5
+SHOW_STEP: 100
+TEST:
+  BATCH_SIZE: 64
+  MODEL_FILE: best_model.pth
+  NUM_WORKERS: 8
+TRAIN:
+  BATCH_SIZE: 128
+  COMBINER:
+    TYPE: bbn_mix
+  LR_SCHEDULER:
+    COSINE_DECAY_END: 0
+    LR_FACTOR: 0.01
+    LR_STEP: [120, 160]
+    TYPE: warmup
+    WARM_EPOCH: 5
+  MAX_EPOCH: 200
+  NUM_WORKERS: 16
+  OPTIMIZER:
+    BASE_LR: 0.1
+    MOMENTUM: 0.9
+    TYPE: SGD
+    WEIGHT_DECAY: 0.0002
+  SAMPLER:
+    DUAL_SAMPLER:
+      ENABLE: True
+      TYPE: reverse
+    TYPE: default
+    WEIGHTED_SAMPLER:
+      TYPE: balance
+  SHUFFLE: True
+  TENSORBOARD:
+    ENABLE: True
+TRANSFORMS:
+  PROCESS_DETAIL:
+    RANDOM_CROP:
+      PADDING: 4
+    RANDOM_RESIZED_CROP:
+      RATIO: (0.75, 1.333333333)
+      SCALE: (0.08, 1.0)
+  TEST_TRANSFORMS: ()
+  TRAIN_TRANSFORMS: ('random_crop', 'random_horizontal_flip')
+VALID_STEP: 1
+2023-04-24 10:10:04,392 -------------------------------------------------------------

@@ -1,7 +1,7 @@
 import _init_paths
 import sys
 from loss import *
-from dataset import *
+from dataset.modelNet import IMBALANCEMODELNET10
 from config import cfg, update_config
 from utils.utils import (
     create_logger,
@@ -14,7 +14,8 @@ from core.function import train_model, valid_model
 from core.combiner import Combiner
 
 import torch
-import os, shutil
+import os
+import shutil
 from torch.utils.data import DataLoader
 import argparse
 import warnings
@@ -31,16 +32,16 @@ def parse_args():
         "--cfg",
         help="decide which cfg to use",
         required=False,
-        default="configs/cifar10.yaml",
+        default="configs/modelNet10.yaml",
         type=str,
     )
     parser.add_argument(
         "--ar",
         help="decide whether to use auto resume",
-        type= ast.literal_eval,
-        dest = 'auto_resume',
+        type=ast.literal_eval,
+        dest='auto_resume',
         required=False,
-        default= True,
+        default=True,
     )
 
     parser.add_argument(
@@ -77,6 +78,7 @@ if __name__ == "__main__":
         "cfg": cfg,
         "device": device,
     }
+    num_classes = para_dict["num_classes"]
 
     criterion = eval(cfg.LOSS.LOSS_TYPE)(para_dict=para_dict)
     epoch_number = cfg.TRAIN.MAX_EPOCH
@@ -136,7 +138,7 @@ if __name__ == "__main__":
     shutil.copytree(os.path.join(this_dir, ".."), code_dir, ignore=ignore)
 
     if tensorboard_dir is not None:
-        dummy_input = torch.rand((1, 3) + cfg.INPUT_SIZE).to(device)
+        dummy_input = torch.rand((1,) + cfg.INPUT_SIZE).to(device)
         writer = SummaryWriter(log_dir=tensorboard_dir)
         writer.add_graph(model if cfg.CPU_MODE else model.module, (dummy_input,))
     else:
@@ -216,12 +218,12 @@ if __name__ == "__main__":
             if valid_acc > best_result:
                 best_result, best_epoch = valid_acc, epoch
                 torch.save({
-                        'state_dict': model.state_dict(),
-                        'epoch': epoch,
-                        'best_result': best_result,
-                        'best_epoch': best_epoch,
-                        'scheduler': scheduler.state_dict(),
-                        'optimizer': optimizer.state_dict(),
+                    'state_dict': model.state_dict(),
+                    'epoch': epoch,
+                    'best_result': best_result,
+                    'best_epoch': best_epoch,
+                    'scheduler': scheduler.state_dict(),
+                    'optimizer': optimizer.state_dict(),
                 }, os.path.join(model_dir, "best_model.pth")
                 )
             logger.info(

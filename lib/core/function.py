@@ -34,13 +34,16 @@ def train_model(
     all_loss = AverageMeter()
     acc = AverageMeter()
     for i, (batch) in enumerate(trainLoader):
-        s = batch.y.shape[0]
-        point_clouds, labels = batch.pos.view(s, -1, 3), batch.y
+        s = batch[1].shape[0]
+        point_clouds, labels = batch[0].view(s, -1, 3), batch[1]
         # point_clouds = point_clouds.to('cuda')
         # labels = labels.to('cuda').to(torch.long)
         meta = None
 
-        loss, now_acc = combiner.forward(model, criterion, point_clouds, labels, meta)
+        # import pdb
+        # pdb.set_trace()
+
+        loss, now_acc = combiner.forward(model, criterion, point_clouds, labels, meta=meta)
 
         optimizer.zero_grad()
         loss.backward()
@@ -54,6 +57,7 @@ def train_model(
                 epoch, i, number_batch, all_loss.val, acc.val * 100
             )
             logger.info(pbar_str)
+        print(f"done step {i+1}/{len(trainLoader)}")
     end_time = time.time()
     pbar_str = "---Epoch:{:>3d}/{}   Avg_Loss:{:>5.3f}   Epoch_Accuracy:{:>5.2f}%   Epoch_Time:{:>5.2f}min---".format(
         epoch, epoch_number, all_loss.avg, acc.avg * 100, (end_time - start_time) / 60
@@ -68,7 +72,6 @@ def valid_model(
     model.eval()
     num_classes = dataLoader.dataset.get_num_classes()
     fusion_matrix = FusionMatrix(num_classes)
-
 
     with torch.no_grad():
         all_loss = AverageMeter()

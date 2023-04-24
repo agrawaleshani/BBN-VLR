@@ -1,55 +1,55 @@
-NAME: 'BBN.MODELNET10.pointnet.200epoch'
-OUTPUT_DIR: './output/modelnet10'
+NAME: "BBN.MODELNET10.pointnet.200epoch"
+OUTPUT_DIR: "./output/modelnet10"
 SHOW_STEP: 100
 SAVE_STEP: 5
 VALID_STEP: 1
-INPUT_SIZE: (32, 32)
-COLOR_SPACE: 'RGB'
-CPU_MODE: False
+INPUT_SIZE: (2048, 3)
+COLOR_SPACE: "RGB"
+CPU_MODE: True
 
 DATASET:
-  DATASET: 'IMBALANCEMODELNET10'
+  DATASET: "IMBALANCEMODELNET10"
   CLASSES: 10
-  IMBALANCECIFAR:
+  IMBALANCEMODELNET10:
     RATIO: 0.02
 
 BACKBONE:
-  TYPE: 'pointNetModel'
+  TYPE: "pointNetModel"
   FEAT: 256
 
 MODULE:
-  TYPE: 'IDENTITY'
+  TYPE: "IDENTITY"
 
 CLASSIFIER:
-  TYPE: 'FC'
+  TYPE: "FC"
   BIAS: True
 
 LOSS:
-  LOSS_TYPE: 'CrossEntropy'
+  LOSS_TYPE: "CrossEntropy"
 
 TRAIN:
   BATCH_SIZE: 128
   MAX_EPOCH: 200
   NUM_WORKERS: 16
   COMBINER:
-    TYPE: 'default'
+    TYPE: "default"
   OPTIMIZER:
-    TYPE: 'SGD'
+    TYPE: "SGD"
     BASE_LR: 0.1
     MOMENTUM: 0.9
     WEIGHT_DECAY: 2e-4
   LR_SCHEDULER:
-    TYPE: 'warmup'
+    TYPE: "warmup"
     LR_STEP: [120, 160]
     LR_FACTOR: 0.01
     WARM_EPOCH: 5
   TENSORBOARD:
     ENABLE: True
   SAMPLER:
-    TYPE: 'default'
+    TYPE: "default"
     DUAL_SAMPLER:
       ENABLE: True
-      TYPE: 'reverse'
+      TYPE: "reverse"
 
 TRANSFORMS:
   TRAIN_TRANSFORMS: ('random_crop', 'random_horizontal_flip')
@@ -58,5 +58,4 @@ TRANSFORMS:
 TEST:
   BATCH_SIZE: 64
   NUM_WORKERS: 8
-  MODEL_FILE: 'best_model.pth'
-
+  MODEL_FILE: "best_model.pth"

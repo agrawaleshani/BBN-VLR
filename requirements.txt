@@ -8,3 +8,4 @@ torch==1.0.1
 torchvision==0.2.2.post3
 tqdm==4.31.1
 yacs==0.1.6
+torch_geometric

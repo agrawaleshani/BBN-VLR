@@ -30,7 +30,6 @@ class Network(nn.Module):
         self.feature_len = self.get_feature_length()
         self.dropout = nn.Dropout(0.3)
 
-
     def forward(self, x, **kwargs):
         if "feature_flag" in kwargs or "feature_cb" in kwargs or "feature_rb" in kwargs:
             return self.extract_feature(x, **kwargs)
@@ -46,7 +45,6 @@ class Network(nn.Module):
             x = self.dropout(x)
         return x
 
-
     def extract_feature(self, x, **kwargs):
         if "bbn" in self.cfg.BACKBONE.TYPE:
             x = self.backbone(x, **kwargs)
@@ -57,17 +55,14 @@ class Network(nn.Module):
 
         return x
 
-
     def freeze_backbone(self):
         print("Freezing backbone .......")
         for p in self.backbone.parameters():
             p.requires_grad = False
 
-
     def load_backbone_model(self, backbone_path=""):
         self.backbone.load_model(backbone_path)
         print("Backbone has been loaded...")
-
 
     def load_model(self, model_path):
         pretrain_dict = torch.load(
@@ -86,33 +81,29 @@ class Network(nn.Module):
         self.load_state_dict(model_dict)
         print("Model has been loaded...")
 
-
     def get_feature_length(self):
         if "cifar" in self.cfg.BACKBONE.TYPE:
             num_features = 64
+        elif "pointNetModel" in self.cfg.BACKBONE.TYPE:
+            num_features = self.cfg.BACKBONE.FEAT
         else:
             num_features = 2048
 
         if "bbn" in self.cfg.BACKBONE.TYPE:
             num_features = num_features * 2
-            
-        if "pointnet" in self.cfg.BACKBONE.TYPE:
-            num_features = self.cfg.BACKBONE.FEAT
-            
-        return num_features
 
+        return num_features
 
     def _get_module(self):
         module_type = self.cfg.MODULE.TYPE
         if module_type == "GAP":
             module = GAP()
-        elif module_type == "Identity":
-            module= Identity()
+        elif module_type == "IDENTITY":
+            module = Identity()
         else:
             raise NotImplementedError
 
         return module
-
 
     def _get_classifer(self):
         bias_flag = self.cfg.CLASSIFIER.BIAS
